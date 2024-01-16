@@ -1,0 +1,150 @@
+<!-- HTML -->
+<div id="xyChartdiv"></div>
+
+<!-- Resources -->
+<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+<script src="//cdn.amcharts.com/lib/5/themes/Dataviz.js"></script>
+
+
+<!-- Chart code -->
+<script>
+  am5.ready(function () {
+    // Fetch JSON data for XY Chart
+
+    fetch('./decTer.json')
+      .then(response => response.json())
+      .then(data => {
+        var root = am5.Root.new("xyChartdiv");
+        var myTheme = am5.Theme.new(root);
+
+        myTheme.rule("Label").setAll({
+          fill: am5.color(0xFF0000),
+          stroke: am5.color(0xFF0006),
+          fontSize: "1.1em"
+        });
+        myTheme.rule("ColorSet").set("colors", [
+          am5.color(0xBE9E55),
+          am5.color(0x318c64),
+          am5.color(0xD2BB88),
+          am5.color(0x86a873),
+          am5.color(0xbb9f06)
+        ]);
+
+        root.setThemes([
+          myTheme,
+          am5themes_Animated.new(root)
+
+        ]);
+
+        console.info("test");
+
+        //root.interfaceColors.set("stroke", am5.color(0xff5000));
+
+
+
+        var chart = root.container.children.push(am5xy.XYChart.new(root, {
+          panX: false,
+          panY: false,
+          wheelX: "panX",
+          wheelY: "zoomX",
+          paddingLeft: 0,
+          layout: root.verticalLayout
+        }));
+
+        chart.children.unshift(am5.Label.new(root, {
+          text: "Objectifs du Décret tertiaire",
+          fontSize: 25,
+          fontWeight: "500",
+          textAlign: "center",
+          x: am5.percent(50),
+          centerX: am5.percent(50),
+          paddingTop: 0,
+          paddingBottom: 0
+        }));
+
+        // Create axes
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+        var xRenderer = am5xy.AxisRendererX.new(root, {
+          minorGridEnabled: true
+        });
+        var xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
+          categoryField: "year",
+          renderer: xRenderer,
+          tooltip: am5.Tooltip.new(root, {})
+        }));
+
+        xRenderer.grid.template.setAll({
+          location: 1
+        })
+        xAxis.data.setAll(data);
+
+        var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+
+          min: 0,
+          renderer: am5xy.AxisRendererY.new(root, {
+            strokeOpacity: 0.1
+          })
+        }));
+
+
+        // Add legend
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
+        var legend = chart.children.push(am5.Legend.new(root, {
+          centerX: am5.p50,
+          x: am5.p50
+        }));
+
+        console.info(data);
+
+        xAxis.data.setAll(data);
+
+
+        // Function to create series and set data
+        function makeSeries(name, fieldName) {
+          var series = chart.series.push(am5xy.ColumnSeries.new(root, {
+            name: name,
+            stacked: true,
+            xAxis: xAxis,
+            yAxis: yAxis,
+            valueYField: fieldName,
+            categoryXField: "year"
+          }));
+
+          series.columns.template.setAll({
+            tooltipText: "{categoryX}: {valueY}",
+            tooltipY: am5.percent(100)
+          });
+
+          series.data.setAll(data);
+
+          series.appear();
+
+          series.bullets.push(function () {
+            return am5.Bullet.new(root, {
+              sprite: am5.Label.new(root, {
+                text: "{valueY}",
+                fill: root.interfaceColors.get("alternativeText"),
+                centerY: am5.p50,
+                centerX: am5.p50,
+                populateText: true
+              })
+            });
+          });
+        }
+
+        makeSeries("01", "01");
+        makeSeries("02", "02");
+        makeSeries("03", "03");
+        makeSeries("04", "04");
+        makeSeries("05", "05");
+        makeSeries("06", "06");
+
+        chart.appear(1000, 100);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  });
+</script>
