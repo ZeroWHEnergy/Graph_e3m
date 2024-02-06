@@ -1,9 +1,9 @@
 [
   {
-    "annRef": 2015,
-    "annRefVal": 118.1,
-    "annDec": 2022,
-    "annDecVal": 91.6,
+    "annRef": 2011,
+    "annRefVal": 100.1,
+    "annDec": 2050,
+    "annDecVal": 99.99,
     "valeurAbs": 107
   }
 ]

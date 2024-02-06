@@ -183,6 +183,21 @@
       .catch(error => {
         console.error('Error fetching data:', error);
       });
+      
+      function forceRefreshOnce() {
+            // Vérifier si le localStorage contient une clé indiquant que le rafraîchissement a déjà été effectué
+            if (!localStorage.getItem('refreshed')) {
+                // Si non, actualiser la page après une seconde
+                setTimeout(function () {
+                    location.reload();
+                    // Enregistrer dans le localStorage que le rafraîchissement a été effectué
+                    localStorage.setItem('refreshed', 'true');
+                }, 1000); // Délai en millisecondes (1000 ms = 1 seconde)
+            }
+        }
+
+        // Appeler la fonction après le chargement complet de la page
+        window.onload = forceRefreshOnce;
 
   }); // end am5.ready()
 
